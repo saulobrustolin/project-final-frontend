@@ -48,7 +48,7 @@ export function LoginForm({
       .then(() => {
         toast.success("Acesso concedido com sucesso");
 
-        navigate("/dashboard");
+        navigate("/");
       })
       .catch((error: AxiosError<ErrorMessage>) => {
         if (error.response?.status === 500) return toast.error("O servidor está em manutenção, tente novamente mais tarde...");

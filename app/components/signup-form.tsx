@@ -112,7 +112,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldDescription>
                 {errors.some(error => error.field == "email") ? errors.filter(error => error.field == "email").map(error => {
                   return (
-                    <p className="text-[var(--destructive)]" key={error.message}>{error.message}</p>
+                    <p className="text-destructive" key={error.message}>{error.message}</p>
                   )
                 }) : "Nós iremos utilizar seu e-mail para confirmar o registro da sua conta"}
               </FieldDescription>
@@ -132,7 +132,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldDescription>
                 {errors.some(error => error.field == "cpf") ? errors.filter(error => error.field == "cpf").map(error => {
                   return (
-                    <p className="text-[var(--destructive)]" key={error.message}>{error.message}</p>
+                    <p className="text-destructive" key={error.message}>{error.message}</p>
                   )
                 }) : "Nós iremos utilizar seu e-mail para confirmar o registro da sua conta"}
               </FieldDescription>
@@ -152,7 +152,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 {errors.some(error => error.field == "password") ? (
                   errors.filter(error => error.field == "password").map(error => {
                     return (
-                      <p className="text-[var(--destructive)]" key={error.message}>{error.message}</p>
+                      <p className="text-destructive" key={error.message}>{error.message}</p>
                     )
                   })
                 ) : "Precisa ter no mínimo 8 caracteres"}
@@ -175,7 +175,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 {errors.some(error => error.field == "confirmPassword") ? (
                   errors.filter(error => error.field == "confirmPassword").map(error => {
                     return (
-                      <p className="text-[var(--destructive)]" key={error.message}>{error.message}</p>
+                      <p className="text-destructive" key={error.message}>{error.message}</p>
                     )
                   })
                 ) : "Por favor, confirme a sua senha."}
