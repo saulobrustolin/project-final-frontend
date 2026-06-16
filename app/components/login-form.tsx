@@ -18,6 +18,8 @@ import { useState, type SyntheticEvent } from "react"
 import api from "~/lib/api"
 import { toast } from "sonner"
 import type { AxiosError } from "axios"
+import type { ErrorMessage } from "~/lib/types"
+import { useNavigate } from "react-router"
 
 interface Login {
   email: string,
@@ -29,6 +31,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [invalidForm, setInvalidForm] = useState<boolean>(false);
+  const navigate = useNavigate();
   const [form, setForm] = useState<Login>({
     email: "",
     password: ""
@@ -37,19 +40,21 @@ export function LoginForm({
   const submitLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    await api.post("/auth/signin", {
+    await api.post("/auth/signin", form, {
       headers: {
         "Content-Type": "application/json"
       }
     })
       .then(() => {
         toast.success("Acesso concedido com sucesso");
+
+        navigate("/dashboard");
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ErrorMessage>) => {
         if (error.response?.status === 500) return toast.error("O servidor está em manutenção, tente novamente mais tarde...");
 
         setInvalidForm(true);
-        return toast.error("E-mail ou senha incorreta");
+        return toast.error(error.response?.data?.message || "E-mail ou senha incorreta");
       });
   }
 
@@ -86,6 +91,7 @@ export function LoginForm({
                   <a
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    tabIndex={-1}
                   >
                     Esqueceu sua senha?
                   </a>

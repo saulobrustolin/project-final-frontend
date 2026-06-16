@@ -57,9 +57,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     ]);
     setErrors([]);
 
-    await api.post("/auth/signup", form, {
-      withCredentials: true
-    })
+    await api.post("/auth/signup", form)
       .then(() => {
         toast.success("Cadastro realizado com sucesso");
 
@@ -94,7 +92,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 <FieldDescription>
                   {errors.filter(error => error.field == "name").map(error => {
                     return (
-                      <p className="text-[var(--destructive)]" key={error.message}>{error.message}</p>
+                      <p className="text-destructive" key={error.message}>{error.message}</p>
                     )
                   })}
                 </FieldDescription>
