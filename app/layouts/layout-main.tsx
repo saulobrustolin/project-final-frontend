@@ -13,7 +13,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 const LayoutMain = () => {
     return (
-        <div className="bg-cream min-screen">
+        <div className="bg-cream min-screen p-2 md:max-w-4/5 lg:max-w-2/3">
             <Outlet />
         </div>
     )

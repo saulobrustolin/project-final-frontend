@@ -37,7 +37,11 @@ export function LoginForm({
   const submitLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    await api.post("/auth/signin")
+    await api.post("/auth/signin", {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
       .then(() => {
         toast.success("Acesso concedido com sucesso");
       })

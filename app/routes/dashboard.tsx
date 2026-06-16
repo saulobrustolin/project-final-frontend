@@ -1,3 +1,4 @@
+import { Card, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/dashboard";
 
 export function meta({}: Route.MetaArgs) {
@@ -10,7 +11,9 @@ export function meta({}: Route.MetaArgs) {
 const Dashboard = () => {
     return (
         <div>
-            -- dashboard --
+            <Card>
+              <CardTitle>Title</CardTitle>
+            </Card>
         </div>
     );
 }
