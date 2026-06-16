@@ -7,4 +7,5 @@ export default [
     route("signin", "routes/signin.tsx"),
     route("signup", "routes/signup.tsx"),
     route(".well-known/appspecific/com.chrome.devtools.json", "routes/dummy-chrome.tsx"),
+    route("*", "routes/notFound.tsx")
 ] satisfies RouteConfig;

@@ -13,8 +13,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 const LayoutMain = () => {
     return (
-        <div className="bg-cream min-screen p-2 md:max-w-4/5 lg:max-w-2/3">
-            <Outlet />
+        <div className="bg-cream min-screen py-4 flex flex-col items-center">
+            <main className="md:max-w-2/3 px-4 w-full">
+                <Outlet />
+            </main>
         </div>
     )
 }
