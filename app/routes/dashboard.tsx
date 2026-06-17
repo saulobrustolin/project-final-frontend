@@ -2,10 +2,10 @@ import { Card, CardContent, CardFooter, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/dashboard";
 import { CalendarIcon, CircleArrowDown, CircleArrowUp, CircleMinus, MoreHorizontalIcon, Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Field, FieldLabel } from "~/components/ui/field";
+import { Field, FieldError, FieldLabel, FieldSet } from "~/components/ui/field";
 import { NumberTicker } from "~/components/ui/number-ticker";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { addDays, format } from "date-fns";
 import { Calendar } from "~/components/ui/calendar";
@@ -16,6 +16,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "~/components/ui/dropdown-menu";
 import ButtonDrawer from "~/components/button-drawer";
 import { DrawerContent } from "~/components/ui/drawer";
+import { Input } from "~/components/ui/input";
+import type { ErrorField, TransactionForm } from "~/lib/types";
+import { NumericFormat } from "react-number-format";
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "~/components/ui/combobox";
+import { collections } from "~/lib/singleton";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -29,8 +34,20 @@ const Dashboard = () => {
     from: new Date(new Date().getFullYear(), 0, 20),
     to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
   });
+  const [form, setForm] = useState<TransactionForm>({
+    description: '',
+    amount: 0,
+    type: "INCOME",
+    collection: 'Não específicado',
+    date: new Date()
+  });
+  const [errors, setErrors] = useState<ErrorField[]>([]);
 
   const resume = resumeQuery(period);
+
+  useEffect(() => {
+    console.log(form.amount);
+  }, [form.amount])
 
   return (
     <>
@@ -133,10 +150,79 @@ const Dashboard = () => {
                 icon: <Plus />
               }}
               titleClose="Fechar"
+              onAction={() => setForm(v => ({ ...v, type: "INCOME" }))}
               className="bg-green-high text-white p-6 hover:bg-green-dark hover:ring-4 hover:ring-neutral-100/25 hover:text-white"
             >
-              <DrawerContent className="p-4">
-                text
+              <DrawerContent className="p-4 py-6">
+                <h1 className="mb-4 font-semibold text-lg">
+                  Criando uma nova transação
+                </h1>
+                <Field>
+                  <FieldSet>
+                    <Field data-invalid={errors.some(error => error.field == "description")}>
+                      <FieldLabel htmlFor="description">Descrição</FieldLabel>
+                      <Input
+                        aria-invalid={errors.some(error => error.field == "description")}
+                        type="text"
+                        defaultValue={form.description}
+                        onBlur={event => setForm(v => ({ ...v, description: event.target.value }))}
+                        id="description"
+                      />
+                      <FieldError>
+                        {errors.filter(error => error.field == "description").map(error => {
+                          return (
+                            <p className="text-destructive" key={error.message}>{error.message}</p>
+                          )
+                        })}
+                      </FieldError>
+                    </Field>
+                    <Field data-invalid={errors.some(error => error.field == "amount")}>
+                      <FieldLabel htmlFor="amount">Preço (R$)</FieldLabel>
+                      <NumericFormat
+                        customInput={Input}
+                        id="amount"
+                        thousandSeparator="."
+                        decimalSeparator=","
+                        prefix="R$ "
+                        decimalScale={2}
+                        fixedDecimalScale
+                        allowNegative={false}
+                        value={(form.amount ?? 0) / 100}
+                        onValueChange={values => setForm(v => ({ ...v, amount: (values.floatValue ? (values.floatValue * 100) : 0) }))}
+                      />
+                      <FieldError>
+                        {errors.filter(error => error.field == "amount").map(error => {
+                          return (
+                            <p className="text-destructive" key={error.message}>{error.message}</p>
+                          )
+                        })}
+                      </FieldError>
+                    </Field>
+                    <Field data-invalid={errors.some(error => error.field == "description")}>
+                      <FieldLabel htmlFor="description">Coleção</FieldLabel>
+                      <Combobox items={collections}>
+                        <ComboboxInput placeholder="Selecione uma coleção" />
+                        <ComboboxContent>
+                          <ComboboxEmpty>Não foi encontrada nenhuma coleção.</ComboboxEmpty>
+                          <ComboboxList>
+                            {(item: string) => (
+                              <ComboboxItem key={item} value={item}>
+                                {item}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
+                      <FieldError>
+                        {errors.filter(error => error.field == "collection").map(error => {
+                          return (
+                            <p className="text-destructive" key={error.message}>{error.message}</p>
+                          )
+                        })}
+                      </FieldError>
+                    </Field>
+                  </FieldSet>
+                </Field>
               </DrawerContent>
             </ButtonDrawer>
             <ButtonDrawer
@@ -145,10 +231,11 @@ const Dashboard = () => {
                 icon: <Plus />
               }}
               titleClose="Fechar"
+              onAction={() => setForm(v => ({ ...v, type: "EXPENSE" }))}
               className="bg-red-400 text-white p-6 hover:bg-red-500 hover:ring-4 hover:ring-neutral-100/25 hover:text-white"
             >
               <DrawerContent className="p-4">
-                text
+
               </DrawerContent>
             </ButtonDrawer>
           </div>

@@ -2,9 +2,9 @@ export interface ErrorMessage {
     message: string
 }
 
-export interface CollectionType {
-    name: string,
-    icon: string
+export interface ErrorField {
+  field: string,
+  message: string
 }
 
 export interface Transaction {
@@ -12,8 +12,12 @@ export interface Transaction {
     description: string,
     amount: number,
     type: "INCOME" | "EXPENSE",
-    collection: CollectionType,
+    collection: string,
     date: Date
+}
+
+export interface TransactionForm extends Omit<Transaction, 'transactionId'> {
+    transactionId?: string | undefined
 }
 
 export interface Budget {

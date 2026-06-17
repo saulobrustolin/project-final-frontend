@@ -11,6 +11,7 @@ interface DialogCreateIncomeProps {
     },
     titleClose: string;
     className?: string;
+    onAction?: () => void
 }
 
 const ButtonDrawer = ({ children, title, className, titleClose }: DialogCreateIncomeProps) => {

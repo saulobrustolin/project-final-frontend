@@ -18,6 +18,7 @@ import { useMask } from '@react-input/mask';
 import api from "~/lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import type { ErrorField } from "~/lib/types";
 
 interface Register {
   name: string,
@@ -27,11 +28,6 @@ interface Register {
   confirmPassword: string
 }
 
-interface FieldError {
-  field: string,
-  message: string
-}
-
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const navigate = useNavigate();
   const cpfRef = useMask({
@@ -39,7 +35,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     replacement: { _: /\d/ },
   });
 
-  const [errors, setErrors] = useState<FieldError[]>([]);
+  const [errors, setErrors] = useState<ErrorField[]>([]);
   const [form, setForm] = useState<Register>({
     name: "",
     email: "",
