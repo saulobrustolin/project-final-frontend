@@ -11,13 +11,15 @@ interface DialogCreateIncomeProps {
     },
     titleClose: string;
     className?: string;
-    onAction?: () => void
+    onAction?: () => void;
+    onOpenChange?: (x: boolean) => void;
+    open?: boolean;
 }
 
-const ButtonDrawer = ({ children, title, className, titleClose }: DialogCreateIncomeProps) => {
+const ButtonDrawer = ({ children, title, className, titleClose, open, onOpenChange, onAction }: DialogCreateIncomeProps) => {
     return (
-        <Drawer direction="right">
-            <DrawerTrigger asChild>
+        <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+            <DrawerTrigger asChild onClick={onAction}>
                 <Button className={cn("", className)} variant="outline">
                     {title.icon ? title.icon : null}
                     {title.name}

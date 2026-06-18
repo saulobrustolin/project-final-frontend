@@ -36,6 +36,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   });
 
   const [errors, setErrors] = useState<ErrorField[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [form, setForm] = useState<Register>({
     name: "",
     email: "",
@@ -53,13 +54,15 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     ]);
     setErrors([]);
 
+    setIsSubmitting(true);
     await api.post("/auth/signup", form)
       .then(() => {
         toast.success("Cadastro realizado com sucesso");
 
         navigate("/");
       })
-      .catch(error => setErrors(error.response.data ?? []));
+      .catch(error => setErrors(error.response.data ?? []))
+      .finally(() => setIsSubmitting(false));
   }
 
   return (
@@ -179,7 +182,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
             <FieldGroup>
               <Field>
-                <Button className={"bg-green-high"} type="submit">Criar conta</Button>
+                <Button className={"bg-green-high"} type="submit" disabled={isSubmitting}>Criar conta</Button>
                 <FieldDescription className="px-6 text-center">
                   Já possui conta? <a href="/signin" className="text-green-high">Entrar</a>
                 </FieldDescription>

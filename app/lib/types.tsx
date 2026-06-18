@@ -7,6 +7,11 @@ export interface ErrorField {
   message: string
 }
 
+export interface CollectionType {
+    name: string,
+    icon: string
+}
+
 export interface Transaction {
     transactionId: string,
     description: string,

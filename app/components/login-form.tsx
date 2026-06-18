@@ -31,6 +31,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [invalidForm, setInvalidForm] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
   const [form, setForm] = useState<Login>({
     email: "",
@@ -40,6 +41,7 @@ export function LoginForm({
   const submitLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    setIsSubmitting(true);
     await api.post("/auth/signin", form, {
       headers: {
         "Content-Type": "application/json"
@@ -55,7 +57,8 @@ export function LoginForm({
 
         setInvalidForm(true);
         return toast.error(error.response?.data?.message || "E-mail ou senha incorreta");
-      });
+      })
+      .finally(() => setIsSubmitting(false));
   }
 
   return (
@@ -110,7 +113,7 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button className={"bg-green-high"} type="submit">Entrar</Button>
+                <Button className={"bg-green-high"} type="submit" disabled={isSubmitting}>Entrar</Button>
                 <FieldDescription className="text-center">
                   Ainda não possui conta? <a href="/signup" className="text-green-high">Registrar</a>
                 </FieldDescription>
