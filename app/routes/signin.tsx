@@ -1,8 +1,8 @@
 import { LoginForm } from "~/components/login-form"
-import type { Route } from "./+types/dashboard";
 import { useSearchParams } from "react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import type { Route } from "./+types/signin";
 
 export async function loader({ request }: Route.LoaderArgs) {
   return { message: "Sign-in page" };

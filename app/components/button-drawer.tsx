@@ -18,7 +18,7 @@ interface DialogCreateIncomeProps {
 
 const ButtonDrawer = ({ children, title, className, titleClose, open, onOpenChange, onAction }: DialogCreateIncomeProps) => {
     return (
-        <Drawer direction="right" open={open} onOpenChange={onOpenChange}>
+        <Drawer direction="bottom" open={open} onOpenChange={onOpenChange}>
             <DrawerTrigger asChild onClick={onAction}>
                 <Button className={cn("", className)} variant="outline">
                     {title.icon ? title.icon : null}

@@ -17,7 +17,7 @@ export interface Transaction {
     description: string,
     amount: number,
     type: "INCOME" | "EXPENSE",
-    collection: string,
+    collection: CollectionType,
     date: Date
 }
 
@@ -29,6 +29,7 @@ export interface Budget {
     budgetId: string,
     description: string,
     target: number,
+    balance: number,
     createdAt: Date
 }
 

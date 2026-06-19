@@ -1,17 +1,19 @@
+import { cn } from "~/lib/utils";
 import { SelectItem } from "./ui/select"
 import * as LucideIcons from "lucide-react"
 
 interface ItemIconProps {
     name: string,
-    icon: string
+    icon: string,
+    className?: string,
 }
 
-const SelectItemIcon = ({ name, icon }: ItemIconProps) => {
+const SelectItemIcon = ({ name, icon, className }: ItemIconProps) => {
     const IconComponent = (LucideIcons as any)[icon];
     
     return (
         <SelectItem key={name} value={name}>
-            <span className="bg-red-400 rounded-full p-2 text-white data-[slot='select-value']:hidden">
+            <span className={cn(className, "rounded-full p-2 text-white data-[slot='select-value']:hidden")}>
                 {<IconComponent />}
             </span>
             <p>

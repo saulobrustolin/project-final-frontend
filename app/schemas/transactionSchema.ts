@@ -1,9 +1,9 @@
 import { z } from "zod";
 
 export const transactionSchema = z.object({
-    transactionId: z.string().nullable(),
+    transactionId: z.string().nullish(),
     description: z.string().nonempty("A descrição é obrigatória"),
-    amount: z.number(),
+    amount: z.number().positive(),
     type: z.enum(["INCOME", "EXPENSE"]),
     collection: z.object({
         name: z.string().nonempty("É necessário escolher uma coleção"),
