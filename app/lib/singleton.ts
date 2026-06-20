@@ -12,3 +12,9 @@ export const collections: Map<string, CollectionType> = new Map([
     ['Mercado', { name: 'Mercado', icon: 'ShoppingBasket' }],
     ['Viagem', { name: 'Viagem', icon: 'Plane' }],
 ]);
+
+export const menus = [
+    { name: 'Transações', to: '/', icon: 'DollarSign' },
+    { name: 'Orçamentos', to: '/budgets', icon: 'HandCoins' },
+    { name: 'Configurações', to: '/settings', icon: 'Settings' }
+];

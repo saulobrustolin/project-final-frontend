@@ -3,6 +3,7 @@ import { requireAuth } from "~/utils/auth.server";
 import type { Route } from "./+types/layout-main";
 import * as LucideIcons from "lucide-react";
 import { Card } from "~/components/ui/card";
+import { menus } from "~/lib/singleton";
 
 export async function loader({ request }: Route.LoaderArgs) {
     const user = await requireAuth(request);
@@ -12,12 +13,6 @@ export async function loader({ request }: Route.LoaderArgs) {
         user
     };
 };
-
-const menus = [
-    { name: 'Transações', to: '/', icon: 'DollarSign' },
-    { name: 'Orçamentos', to: '/budgets', icon: 'HandCoins' },
-    { name: 'Configurações', to: '/settings', icon: 'Settings' },
-];
 
 const LayoutMain = () => {
     const navigate = useNavigate();

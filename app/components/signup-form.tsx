@@ -9,60 +9,51 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
-import { useState, type SyntheticEvent } from "react";
 import { useMask } from '@react-input/mask';
-import api from "~/lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
-import type { ErrorField } from "~/lib/types";
-
-interface Register {
-  name: string,
-  email: string,
-  cpf: string,
-  password: string,
-  confirmPassword: string
-}
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { usersSchema, type UserData } from "~/schemas/userSchema";
+import { useSignup } from "~/queries/signupQuery";
+import { LoaderCircle } from "lucide-react";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const signup = useSignup();
   const navigate = useNavigate();
   const cpfRef = useMask({
     mask: '___.___.___-__',
     replacement: { _: /\d/ },
   });
 
-  const [errors, setErrors] = useState<ErrorField[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [form, setForm] = useState<Register>({
-    name: "",
-    email: "",
-    cpf: "",
-    password: "",
-    confirmPassword: ""
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(usersSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      cpf: '',
+      password: '',
+      confirmPassword: ''
+    }
   });
 
-  const submitRegister = async (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (form.password != form.confirmPassword) return setErrors([
-      { field: "password", message: "A senha precisa ser igual a de confirmação" },
-      { field: "confirmPassword", message: "" },
-    ]);
-    setErrors([]);
-
-    setIsSubmitting(true);
-    await api.post("/auth/signup", form)
-      .then(() => {
-        toast.success("Cadastro realizado com sucesso");
-
+  const submitRegister = async (data: UserData) => {
+    await signup.mutateAsync(data, {
+      onSuccess: () => {
+        toast.success("Usuário registrado com sucesso");
         navigate("/");
-      })
-      .catch(error => setErrors(error.response.data ?? []))
-      .finally(() => setIsSubmitting(false));
+      },
+      onError: response => toast.error(response.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...")
+    });
   }
 
   return (
@@ -74,115 +65,92 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={submitRegister}>
+        <form onSubmit={handleSubmit(submitRegister)}>
           <FieldGroup>
-            <Field data-invalid={errors.some(error => error.field == "name")}>
+            <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="name">Nome completo</FieldLabel>
               <Input
-                aria-invalid={errors.some(error => error.field == "name")}
+                aria-invalid={!!errors.name}
                 id="name"
                 type="text"
                 placeholder="Digite seu nome completo"
                 required
-                value={form.name}
-                onChange={e => setForm(v => ({ ...v, name: e.target.value }))}
+                {...register("name")}
               />
-              {errors.some(error => error.field == "name") ? (
-                <FieldDescription>
-                  {errors.filter(error => error.field == "name").map(error => {
-                    return (
-                      <p className="text-destructive" key={error.message}>{error.message}</p>
-                    )
-                  })}
-                </FieldDescription>
-              ) : null}
+
+              <FieldError>
+                {errors.name && <p className="text-destructive">{errors.name.message}</p>}
+              </FieldError>
             </Field>
-            <Field data-invalid={errors.some(error => error.field == "email")}>
+            <Field data-invalid={!!errors.email}>
               <FieldLabel htmlFor="email">E-mail</FieldLabel>
               <Input
-                aria-invalid={errors.some(error => error.field == "email")}
+                aria-invalid={!!errors.email}
                 id="email"
                 type="email"
                 placeholder="Digite seu e-mail"
                 required
-                value={form.email}
-                onChange={e => setForm(v => ({ ...v, email: e.target.value }))}
+                {...register("email")}
               />
-              <FieldDescription>
-                {errors.some(error => error.field == "email") ? errors.filter(error => error.field == "email").map(error => {
-                  return (
-                    <p className="text-destructive" key={error.message}>{error.message}</p>
-                  )
-                }) : "Nós iremos utilizar seu e-mail para confirmar o registro da sua conta"}
-              </FieldDescription>
+              <FieldError>
+                {errors.email && <p className="text-destructive">{errors.email.message}</p>}
+              </FieldError>
             </Field>
-            <Field data-invalid={errors.some(error => error.field == "cpf")}>
+            <Field data-invalid={!!errors.cpf}>
               <FieldLabel htmlFor="cpf">CPF</FieldLabel>
               <Input
-                ref={cpfRef}
-                aria-invalid={errors.some(error => error.field == "cpf")}
+                aria-invalid={!!errors.cpf}
                 id="cpf"
                 type="text"
                 placeholder="Digite seu CPF"
                 required
-                value={form.cpf}
-                onChange={(e) => setForm(v => ({ ...v, cpf: e.target.value }))}
+                {...register("cpf")}
+                ref={(e) => {
+                  register("cpf").ref(e);
+                  if (e) {
+                    cpfRef.current = e;
+                  }
+                }}
               />
-              <FieldDescription>
-                {errors.some(error => error.field == "cpf") ? errors.filter(error => error.field == "cpf").map(error => {
-                  return (
-                    <p className="text-destructive" key={error.message}>{error.message}</p>
-                  )
-                }) : "Nós iremos utilizar seu e-mail para confirmar o registro da sua conta"}
-              </FieldDescription>
+              <FieldError>
+                {errors.cpf && <p className="text-destructive">{errors.cpf.message}</p>}
+              </FieldError>
             </Field>
-            <Field data-invalid={errors.some(error => error.field == "password")}>
+            <Field data-invalid={!!errors.password}>
               <FieldLabel htmlFor="password">Senha</FieldLabel>
               <Input
-                aria-invalid={errors.some(error => error.field == "password")}
+                aria-invalid={!!errors.password}
                 id="password"
                 type="password"
                 required
                 placeholder="Digite a sua senha"
-                value={form.password}
-                onChange={e => setForm(v => ({ ...v, password: e.target.value }))}
+                {...register("password")}
               />
-              <FieldDescription>
-                {errors.some(error => error.field == "password") ? (
-                  errors.filter(error => error.field == "password").map(error => {
-                    return (
-                      <p className="text-destructive" key={error.message}>{error.message}</p>
-                    )
-                  })
-                ) : "Precisa ter no mínimo 8 caracteres"}
-              </FieldDescription>
+              <FieldError>
+                {errors.password && <p className="text-destructive">{errors.password.message}</p>}
+              </FieldError>
             </Field>
-            <Field data-invalid={errors.some(error => error.field == "confirmPassword")}>
+            <Field data-invalid={!!errors.confirmPassword}>
               <FieldLabel htmlFor="confirm-password">
                 Confirmar senha
               </FieldLabel>
               <Input
-                aria-invalid={errors.some(error => error.field == "confirmPassword")}
+                aria-invalid={!!errors.confirmPassword}
                 id="confirm-password"
                 type="password"
                 required
                 placeholder="Digite a sua confirmação de senha"
-                value={form.confirmPassword}
-                onChange={e => setForm(v => ({ ...v, confirmPassword: e.target.value }))}
+                {...register("confirmPassword")}
               />
-              <FieldDescription>
-                {errors.some(error => error.field == "confirmPassword") ? (
-                  errors.filter(error => error.field == "confirmPassword").map(error => {
-                    return (
-                      <p className="text-destructive" key={error.message}>{error.message}</p>
-                    )
-                  })
-                ) : "Por favor, confirme a sua senha."}
-              </FieldDescription>
+              <FieldError>
+                {errors.confirmPassword && <p className="text-destructive">{errors.confirmPassword.message}</p>}
+              </FieldError>
             </Field>
             <FieldGroup>
               <Field>
-                <Button className={"bg-green-high"} type="submit" disabled={isSubmitting}>Criar conta</Button>
+                <Button className={"bg-green-high"} type="submit" disabled={signup.isPending}>
+                  {signup.isPending ? <LoaderCircle className="animate-sping" /> : "Criar conta"}
+                </Button>
                 <FieldDescription className="px-6 text-center">
                   Já possui conta? <a href="/signin" className="text-green-high">Entrar</a>
                 </FieldDescription>

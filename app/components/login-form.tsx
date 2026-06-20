@@ -20,6 +20,11 @@ import { toast } from "sonner"
 import type { AxiosError } from "axios"
 import type { ErrorMessage } from "~/lib/types"
 import { useNavigate } from "react-router"
+import { useForm } from "react-hook-form"
+import { loginSchema, type LoginData } from "~/schemas/loginSchema"
+import { zodResolver } from "@hookform/resolvers/zod"
+import useSignin from "~/queries/signinQuery"
+import { LoaderCircle } from "lucide-react"
 
 interface Login {
   email: string,
@@ -30,35 +35,29 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [invalidForm, setInvalidForm] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const navigate = useNavigate();
-  const [form, setForm] = useState<Login>({
-    email: "",
-    password: ""
-  });
+  const signin = useSignin();
   
-  const submitLogin = async (event: SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    setIsSubmitting(true);
-    await api.post("/auth/signin", form, {
-      headers: {
-        "Content-Type": "application/json"
+  const {
+      register,
+      handleSubmit,
+      formState: { errors }
+    } = useForm({
+      resolver: zodResolver(loginSchema),
+      defaultValues: {
+        email: '',
+        password: ''
       }
-    })
-      .then(() => {
-        toast.success("Acesso concedido com sucesso");
-
+    });
+  
+  const submitLogin = async (data: LoginData) => {
+    await signin.mutateAsync(data, {
+      onSuccess: () => {
+        toast.success("Usuário autenticado com sucesso");
         navigate("/");
-      })
-      .catch((error: AxiosError<ErrorMessage>) => {
-        if (error.response?.status === 500) return toast.error("O servidor está em manutenção, tente novamente mais tarde...");
-
-        setInvalidForm(true);
-        return toast.error(error.response?.data?.message || "E-mail ou senha incorreta");
-      })
-      .finally(() => setIsSubmitting(false));
+      },
+      onError: (response) => toast.error(response.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...")
+    })
   }
 
   return (
@@ -71,24 +70,20 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={submitLogin}>
+          <form onSubmit={handleSubmit(submitLogin)}>
             <FieldGroup>
-              <Field data-invalid={invalidForm}>
+              <Field data-invalid={!!errors.email}>
                 <FieldLabel htmlFor="email">E-mail</FieldLabel>
                 <Input
-                  aria-invalid={invalidForm}
+                  aria-invalid={!!errors.email}
                   id="email"
                   type="email"
                   placeholder="Digite o seu e-mail"
                   required
-                  value={form.email}
-                  onChange={e => {
-                    setForm(v => ({ ...v, email: e.target.value }));
-                    setInvalidForm(false);
-                  }}
+                  {...register("email")}
                 />
               </Field>
-              <Field data-invalid={invalidForm}>
+              <Field data-invalid={!!errors.password}>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Senha</FieldLabel>
                   <a
@@ -100,20 +95,18 @@ export function LoginForm({
                   </a>
                 </div>
                 <Input
-                  aria-invalid={invalidForm}
+                  aria-invalid={!!errors.password}
                   id="password"
                   type="password"
                   required
                   placeholder="Digite a sua senha"
-                  value={form.password}
-                  onChange={e => {
-                    setForm(v => ({ ...v, password: e.target.value }));
-                    setInvalidForm(false);
-                  }}
+                  {...register("password")}
                 />
               </Field>
               <Field>
-                <Button className={"bg-green-high"} type="submit" disabled={isSubmitting}>Entrar</Button>
+                <Button className={"bg-green-high"} type="submit" disabled={signin.isPending}>
+                  {signin.isPending ? <LoaderCircle className="animate-spin" /> : "Entrar"}
+                </Button>
                 <FieldDescription className="text-center">
                   Ainda não possui conta? <a href="/signup" className="text-green-high">Registrar</a>
                 </FieldDescription>
