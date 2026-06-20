@@ -13,7 +13,7 @@ export interface CollectionType {
 }
 
 export interface Transaction {
-    transactionId: string,
+    transactionId?: string,
     description: string,
     amount: number,
     type: "INCOME" | "EXPENSE",

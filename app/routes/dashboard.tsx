@@ -29,6 +29,7 @@ import createTransactionQuery from "~/queries/createTransactionQuery";
 import { toast } from "sonner";
 import Alert from "~/components/alert";
 import useDeleteTransaction from "~/queries/deleteTransactionQuery";
+import useUpdateTransaction from "~/queries/updateTransactionQuery";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -50,6 +51,7 @@ const Dashboard = () => {
   const resume = resumeQuery(period);
   const createTransaction = createTransactionQuery();
   const deleteTransaction = useDeleteTransaction();
+  const updateTransaction = useUpdateTransaction();
 
   const {
     register,
@@ -71,19 +73,44 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!openCreateTransaction && !isDeleteDialogOpen && !isUpdateDialogOpen) reset();
+    if (!openCreateTransaction && !isDeleteDialogOpen && !isUpdateDialogOpen) reset({
+      description: '',
+      amount: 0,
+      collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
+      date: new Date(),
+      type: "INCOME"
+    });
   }, [openCreateTransaction, isDeleteDialogOpen, isUpdateDialogOpen])
-
-  useEffect(() => {
-    console.log(watch("collection"));
-  }, [watch("collection")])
 
   const submitCreateTransaction = async (data: TransactionData) => {
     await createTransaction.mutate(data, {
       onSuccess: () => {
         toast.success("A transação foi criada com sucesso");
         setOpenCreateTransaction(false);
-        reset();
+        reset({
+          description: '',
+          amount: 0,
+          collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
+          date: new Date(),
+          type: "INCOME"
+        });
+      },
+      onError: () => toast.error("O servidor está em manutenção no momento, tente novamente mais tarde...")
+    });
+  }
+
+  const submitUpdateTransaction = async (data: TransactionData) => {
+    await updateTransaction.mutate(data, {
+      onSuccess: () => {
+        toast.success("A transação foi editada com sucesso");
+        setIsUpdateDialogOpen(false);
+        reset({
+          description: '',
+          amount: 0,
+          collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
+          date: new Date(),
+          type: "INCOME"
+        });
       },
       onError: () => toast.error("O servidor está em manutenção no momento, tente novamente mais tarde...")
     });
@@ -100,8 +127,14 @@ const Dashboard = () => {
     await deleteTransaction.mutateAsync(transactionId ?? '', {
       onSuccess: () => {
         toast.success("A transação foi deletada com sucesso");
+        reset({
+          description: '',
+          amount: 0,
+          collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
+          date: new Date(),
+          type: "INCOME"
+        });
         setIsDeleteDialogOpen(false);
-        reset();
       },
       onError: () => toast.error("O servidor está em manutenção, tente novamente mais tarde...")
     });
@@ -389,13 +422,16 @@ const Dashboard = () => {
                             <TableCell className="text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild >
-                                  <Button variant="ghost" size="icon" className="size-8"><MoreHorizontalIcon /><span className="sr-only"></span></Button>
+                                  <Button variant="ghost" size="icon" className="size-8">
+                                    <MoreHorizontalIcon />
+                                    <span className="sr-only"></span>
+                                  </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem
                                     onSelect={e => {
                                       e.preventDefault();
-                                      const t = { ...transaction, collection: collections.get(transaction.collection.name) };
+                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), date: new Date(transaction.date) };
                                       reset(t);
                                       setIsUpdateDialogOpen(true);
                                     }}
@@ -450,11 +486,11 @@ const Dashboard = () => {
         className="bg-red-400 hidden text-white p-6 hover:bg-red-500 hover:ring-4 hover:ring-neutral-100/25 hover:text-white"
       >
         <DrawerContent className="p-4 py-6">
-          <form id="create-transaction-form" className="flex flex-col justify-between h-full" onSubmit={handleSubmit(submitCreateTransaction)}>
+          <form id="update-transaction-form" className="flex flex-col justify-between h-full" onSubmit={handleSubmit(submitUpdateTransaction)}>
             <div className="flex flex-col justify-between h-full gap-4">
               <div>
                 <h1 className="mb-4 font-semibold text-lg">
-                  Criando uma nova transação
+                  Editando transação
                 </h1>
                 <Field>
                   <FieldSet>
@@ -510,7 +546,7 @@ const Dashboard = () => {
                               <SelectGroup>
                                 {Array.from(collections.entries()).map(([k, c]: [string, CollectionType]) => {
                                   return (
-                                    <SelectItemIcon key={k} name={c.name} icon={c.icon} />
+                                    <SelectItemIcon key={k} name={c.name} icon={c.icon} className={watch("type") === "INCOME" ? "bg-green-dark" : "bg-red-400"} />
                                   )
                                 })}
                               </SelectGroup>
@@ -556,7 +592,7 @@ const Dashboard = () => {
                   </FieldSet>
                 </Field>
               </div>
-              <Button type="submit" disabled={createTransaction.isPending} form="create-transaction-form">
+              <Button type="submit" disabled={createTransaction.isPending} form="update-transaction-form">
                 {createTransaction.isPending ? <Loader className="animate-spin" /> : "Enviar transação"}
               </Button>
             </div>

@@ -2,13 +2,13 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import getBudgetsQuery from "~/queries/getBudgetQuery";
 import type { Route } from "./+types/budgets";
 import { Skeleton } from "~/components/ui/skeleton";
-import { CircleMinus, Loader, Plus, Pointer } from "lucide-react";
+import { Loader, Plus, Pointer } from "lucide-react";
 import type { Budget } from "~/lib/types";
 import ButtonDrawer from "~/components/button-drawer";
 import { Controller, useForm } from "react-hook-form";
 import { budgetSchema, type BudgetData } from "~/schemas/budgetSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type SubmitEvent, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { DrawerContent } from "~/components/ui/drawer";
 import { Field, FieldError, FieldLabel, FieldSet } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import useDeleteBudget from "~/queries/deleteBudgetQuery";
 import useUpdateBudget from "~/queries/updateBudgetQuery";
 import Alert from "~/components/alert";
-import { data } from "react-router";
+import { format } from "date-fns";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -30,7 +30,6 @@ export function meta({ }: Route.MetaArgs) {
 
 const Budgets = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [openCreateBudget, setOpenCreateBudget] = useState<boolean>(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
     const budgets = getBudgetsQuery();
@@ -60,7 +59,12 @@ const Budgets = () => {
             onSuccess: () => {
                 setIsOpen(false);
                 toast.success("Budget criado com sucesso");
-                reset();
+                reset({
+            description: '',
+            target: 0,
+            balance: 0,
+            createdAt: new Date()
+        });
             },
             onError: () => toast.error("O servidor está em manutenção, tente novamente mais tarde...")
         });
@@ -73,7 +77,12 @@ const Budgets = () => {
             onSuccess: () => {
                 toast.success("O budget foi deletado com sucesso");
                 setIsOpen(false);
-                reset();
+                reset({
+            description: '',
+            target: 0,
+            balance: 0,
+            createdAt: new Date()
+        });
             },
             onError: () => {
                 toast.error("O servidor está em manutenção, tente novamente mais tarde...");
@@ -88,7 +97,12 @@ const Budgets = () => {
             onSuccess: () => {
                 toast.success("O budget foi atualizado com sucesso");
                 setIsOpen(false);
-                reset();
+                reset({
+            description: '',
+            target: 0,
+            balance: 0,
+            createdAt: new Date()
+        });
             },
             onError: () => {
                 toast.error("O servidor está em manutenção, tente novamente mais tarde...");
@@ -106,8 +120,13 @@ const Budgets = () => {
     }
 
     useEffect(() => {
-        if (!isOpen) reset();
-    }, [isOpen])
+        if (!isOpen && !isDeleteDialogOpen) reset({
+            description: '',
+            target: 0,
+            balance: 0,
+            createdAt: new Date()
+        });
+    }, [isOpen, isDeleteDialogOpen])
 
     return (
         <>
@@ -232,9 +251,14 @@ const Budgets = () => {
                             return (
                                 <Card className="p-4 min-h-28 ring-0 relative cursor-pointer hover:bg-neutral-900/2" key={`${b.createdAt}-${b.description}-${index}`} onClick={() => handleEditBudget(b)}>
                                     <CardTitle className="flex justify-between">
-                                        <span className="lowercase">
-                                            {b.description}
-                                        </span>
+                                        <div className="flex flex-col sm:flex-row sm:gap-1 sm:items-end">
+                                            <span className="lowercase">
+                                                {b.description}
+                                            </span>
+                                            <span className="text-black/75 text-xs">
+                                                criado em {format(b.createdAt, "dd/MM/yyyy")}
+                                            </span>
+                                        </div>
                                         <span className="font-medium text-xs opacity-60">
                                             {percentil >= 100 ? (
                                                 "concluído"
