@@ -30,6 +30,8 @@ import { toast } from "sonner";
 import Alert from "~/components/alert";
 import useDeleteTransaction from "~/queries/deleteTransactionQuery";
 import useUpdateTransaction from "~/queries/updateTransactionQuery";
+import { Switch } from "~/components/ui/switch";
+import { Label } from "~/components/ui/label";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -42,10 +44,11 @@ const Dashboard = () => {
   const [openCreateTransaction, setOpenCreateTransaction] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
+  const [isSubdivision, setIsSubdivision] = useState<boolean>(false);
 
   const [period, setPeriod] = useState<DateRange | undefined>({
-    from: addDays(new Date(new Date()), -30),
-    to: new Date(new Date()),
+    from: addDays(new Date(), -15),
+    to: addDays(new Date(), 15),
   });
 
   const resume = resumeQuery(period);
@@ -59,6 +62,7 @@ const Dashboard = () => {
     setValue,
     handleSubmit,
     reset,
+    unregister,
     watch,
     formState: { errors }
   } = useForm<TransactionData>({
@@ -140,6 +144,14 @@ const Dashboard = () => {
     });
   }
 
+  const handleSelectCalendar = (range: DateRange | undefined) => {
+    if (!period || (period.from && period.to)) {
+      setPeriod({ from: range?.from || range?.to, to: undefined });
+    } else {
+      setPeriod(range);
+    }
+  };
+
   return (
     <>
       <Card className="flex flex-col gap-4 bg-transparent ring-0 p-0.5">
@@ -166,9 +178,10 @@ const Dashboard = () => {
                 mode="range"
                 defaultMonth={period?.from}
                 selected={period}
-                onSelect={setPeriod}
+                onSelect={handleSelectCalendar}
                 numberOfMonths={2}
                 locale={ptBR}
+                showOutsideDays={false}
               />
             </PopoverContent>
           </Popover>
@@ -311,6 +324,32 @@ const Dashboard = () => {
                               {errors.amount && <p className="text-destructive">{errors.amount.message}</p>}
                             </FieldError>
                           </Field>
+                          {watch("type") === "EXPENSE" ? (
+                            <>
+                              <div className="flex items-center space-x-2">
+                                <Switch id="subdivision-switch" onCheckedChange={v => {
+                                  setIsSubdivision(v);
+                                  if (!v) unregister("subdivision");
+                                }} />
+                                <Label htmlFor="subdivision-switch">Parcelamento</Label>
+                              </div>
+                              {isSubdivision ? (
+                                <Field data-invalid={!!errors.subdivision}>
+                                  <FieldLabel htmlFor="subdivision">Nº de parcelas</FieldLabel>
+                                  <Input
+                                    id="subdivision"
+                                    placeholder="Digite o número de parcelas"
+                                    aria-invalid={!!errors.subdivision}
+                                    type="number"
+                                    {...register("subdivision", { valueAsNumber: true })}
+                                  />
+                                  <FieldError>
+                                    {errors.subdivision && <p className="text-destructive">{errors.subdivision.message}</p>}
+                                  </FieldError>
+                                </Field>
+                              ) : null}
+                            </>
+                          ) : null}
                           <Field data-invalid={!!errors.collection}>
                             <FieldLabel htmlFor="collection">Coleção</FieldLabel>
                             <Controller
@@ -417,7 +456,7 @@ const Dashboard = () => {
                                 displayType="text"
                               />
                             </TableCell>
-                            <TableCell className="font-medium truncate hidden md:block" aria-label={collections.get(transaction.collection.name)?.name || 'Não especificado'}>{collections.get(transaction.collection.name)?.name || 'Não especificado'}</TableCell>
+                            <TableCell className="font-medium truncate hidden md:table-cell" aria-label={collections.get(transaction.collection.name)?.name || 'Não especificado'}>{collections.get(transaction.collection.name)?.name || 'Não especificado'}</TableCell>
                             <TableCell className="font-medium truncate" aria-label={format(transaction.date, 'dd/MM/yyyy')}>{format(transaction.date, 'dd/MM/yyyy')}</TableCell>
                             <TableCell className="text-right">
                               <DropdownMenu>

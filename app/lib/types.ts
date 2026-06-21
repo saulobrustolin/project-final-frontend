@@ -38,6 +38,5 @@ export interface Resume {
     net_balance: number,
     credit: number,
     debit: number,
-    transactions: Transaction[],
-    budgets: Budget[]
+    transactions: Transaction[]
 }

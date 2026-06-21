@@ -14,6 +14,6 @@ export const updateUserSchema = z.object({
     return Object.fromEntries(
         Object.entries(data).filter(([_, value]) => value !== undefined && value !== "")
     );
-});;
+});
 
 export type UpdateUserData = z.infer<typeof updateUserSchema>;
