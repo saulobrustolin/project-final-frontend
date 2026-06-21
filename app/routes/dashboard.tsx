@@ -395,7 +395,7 @@ const Dashboard = () => {
                       <TableRow className="bg-transparent">
                         <TableHead className="font-bold">Descrição</TableHead>
                         <TableHead className="font-bold">Preço</TableHead>
-                        <TableHead className="font-bold hidden md:block">Coleção</TableHead>
+                        <TableHead className="font-bold hidden md:table-cell">Coleção</TableHead>
                         <TableHead className="font-bold">Data</TableHead>
                         <TableHead className="text-right font-bold">Ações</TableHead>
                       </TableRow>

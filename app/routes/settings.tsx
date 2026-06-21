@@ -13,6 +13,8 @@ import { DoorOpen, LoaderCircle } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import sendCodeQuery from "~/queries/sendCodeQuery";
+import type { AxiosError } from "axios";
+import type { ErrorField } from "~/lib/types";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -33,6 +35,7 @@ const Budgets = () => {
         register,
         handleSubmit,
         reset,
+        setError,
         formState: { errors }
     } = useForm({
         resolver: zodResolver(updateUserSchema),
@@ -60,7 +63,17 @@ const Budgets = () => {
                 });
             },
             onError: response => {
-                toast.error(response.message ?? "O servidor está em manutenção, tente novamente mais tarde...");
+                const r = response.response?.data;
+                if (Array.isArray(r) && r.length) {
+                    const first = r[0];
+
+                    setError(first.field as "name" | "email" | "currentPassword" | "password" | "confirmPassword" | "code" | "form" | `root.${string}` | "root" | `form.${string}`, {
+                        type: "server",
+                        message: first.message
+                    });
+                } else {
+                    toast.error(response.message ?? "O servidor está em manutenção, tente novamente mais tarde...");
+                }
             }
         })
     }
@@ -77,7 +90,7 @@ const Budgets = () => {
         setCodeSubmitted(true);
         setInterval(() => {
             setCodeSubmitted(false);
-        }, 1200000)
+        }, 12000)
     }
 
     return (
@@ -103,7 +116,6 @@ const Budgets = () => {
                                     id="name"
                                     type="text"
                                     placeholder="Digite seu nome completo"
-                                    required
                                     {...register("name")}
                                 />
 
@@ -118,11 +130,23 @@ const Budgets = () => {
                                     id="email"
                                     type="email"
                                     placeholder="Digite seu e-mail"
-                                    required
                                     {...register("email")}
                                 />
                                 <FieldError>
                                     {errors.email && <p className="text-destructive">{errors.email.message}</p>}
+                                </FieldError>
+                            </Field>
+                            <Field data-invalid={!!errors.currentPassword}>
+                                <FieldLabel htmlFor="password">Senha atual</FieldLabel>
+                                <Input
+                                    aria-invalid={!!errors.currentPassword}
+                                    id="currentPassword"
+                                    type="password"
+                                    placeholder="Digite a sua senha atual"
+                                    {...register("currentPassword")}
+                                />
+                                <FieldError>
+                                    {errors.currentPassword && <p className="text-destructive">{errors.currentPassword.message}</p>}
                                 </FieldError>
                             </Field>
                             <Field data-invalid={!!errors.password}>
@@ -131,7 +155,6 @@ const Budgets = () => {
                                     aria-invalid={!!errors.password}
                                     id="password"
                                     type="password"
-                                    required
                                     placeholder="Digite a sua senha"
                                     {...register("password")}
                                 />
@@ -147,7 +170,6 @@ const Budgets = () => {
                                     aria-invalid={!!errors.confirmPassword}
                                     id="confirm-password"
                                     type="password"
-                                    required
                                     placeholder="Digite a sua confirmação de senha"
                                     {...register("confirmPassword")}
                                 />

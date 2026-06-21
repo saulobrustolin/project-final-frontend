@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import type { AxiosResponse } from "axios";
+import { useMutation } from "@tanstack/react-query"
+import type { AxiosError, AxiosResponse } from "axios";
 import api from "~/lib/api";
-import type { Resume } from "~/lib/types";
+import type { ErrorMessage, Resume } from "~/lib/types";
 import type { LoginData } from "~/schemas/loginSchema";
 
 const signin = async (data: LoginData) => {
@@ -11,8 +11,8 @@ const signin = async (data: LoginData) => {
 }
 
 export function useSignin() {
-  return useMutation({
-    mutationFn: signin
+  return useMutation<Resume, AxiosError<ErrorMessage>, LoginData>({
+    mutationFn: signin,
   });
 }
 

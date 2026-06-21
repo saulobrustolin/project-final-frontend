@@ -56,7 +56,9 @@ export function LoginForm({
         toast.success("Usuário autenticado com sucesso");
         navigate("/");
       },
-      onError: (response) => toast.error(response.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...")
+      onError: error => {
+        toast.error(error.response?.data?.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...");
+      }
     })
   }
 
