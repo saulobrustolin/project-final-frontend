@@ -144,14 +144,6 @@ const Dashboard = () => {
     });
   }
 
-  const handleSelectCalendar = (range: DateRange | undefined) => {
-    if (!period || (period.from && period.to)) {
-      setPeriod({ from: range?.from || range?.to, to: undefined });
-    } else {
-      setPeriod(range);
-    }
-  };
-
   return (
     <>
       <Card className="flex flex-col gap-4 bg-transparent ring-0 p-0.5">
@@ -178,7 +170,7 @@ const Dashboard = () => {
                 mode="range"
                 defaultMonth={period?.from}
                 selected={period}
-                onSelect={handleSelectCalendar}
+                onSelect={setPeriod}
                 numberOfMonths={2}
                 locale={ptBR}
                 showOutsideDays={false}
