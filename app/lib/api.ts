@@ -15,6 +15,13 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
+      
+      const requestUrl = error.config.url;
+
+      if (requestUrl && requestUrl.includes('/auth/signin')) {
+        return Promise.reject(error);
+      }
+
       window.location.href = "/login";
     }
 

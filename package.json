@@ -41,6 +41,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.0",
     "@react-router/dev": "7.17.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^22",

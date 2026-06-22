@@ -10,15 +10,12 @@ import {
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
-import { useState, type SyntheticEvent } from "react"
-import api from "~/lib/api"
 import { toast } from "sonner"
-import type { AxiosError } from "axios"
-import type { ErrorMessage } from "~/lib/types"
 import { useNavigate } from "react-router"
 import { useForm } from "react-hook-form"
 import { loginSchema, type LoginData } from "~/schemas/loginSchema"
@@ -26,38 +23,46 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import useSignin from "~/queries/signinQuery"
 import { LoaderCircle } from "lucide-react"
 
-interface Login {
-  email: string,
-  password: string
-}
-
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const navigate = useNavigate();
   const signin = useSignin();
-  
+
   const {
-      register,
-      handleSubmit,
-      formState: { errors }
-    } = useForm({
-      resolver: zodResolver(loginSchema),
-      defaultValues: {
-        email: '',
-        password: ''
-      }
-    });
-  
-  const submitLogin = async (data: LoginData) => {
-    await signin.mutateAsync(data, {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
+
+  const submitLogin = (data: LoginData) => {
+    signin.mutate(data, {
       onSuccess: () => {
         toast.success("Usuário autenticado com sucesso");
         navigate("/");
       },
       onError: error => {
-        toast.error(error.response?.data?.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...");
+        const r = error.response?.data;
+        if (r?.message) {
+          setError("password", {
+            type: "server",
+            message: r.message
+          });
+          setError("email", {
+            type: "server",
+            message: undefined
+          });
+        } else {
+          toast.error("O servidor está em manutenção no momento, tente novamente mais tarde...");
+        }
       }
     })
   }
@@ -104,9 +109,12 @@ export function LoginForm({
                   placeholder="Digite a sua senha"
                   {...register("password")}
                 />
+                <FieldError>
+                  {errors.password && <p className="text-destructive">{errors.password.message}</p>}
+                </FieldError>
               </Field>
               <Field>
-                <Button className={"bg-green-high"} type="submit" disabled={signin.isPending}>
+                <Button type="submit" className={"bg-green-high"} disabled={signin.isPending}>
                   {signin.isPending ? <LoaderCircle className="animate-spin" /> : "Entrar"}
                 </Button>
                 <FieldDescription className="text-center">

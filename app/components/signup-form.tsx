@@ -33,6 +33,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   const {
     register,
+    setError,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -52,7 +53,19 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         toast.success("Usuário registrado com sucesso");
         navigate("/");
       },
-      onError: response => toast.error(response.message ?? "O servidor está em manutenção no momento, tente novamente mais tarde...")
+      onError: response => {
+        const r = response.response?.data;
+        if (Array.isArray(r) && r.length) {
+          const first = r[0];
+
+          setError(first.field as "form" | "name" | "email" | "cpf" | "password" | "confirmPassword" | `root.${string}` | "root" | `form.${string}`, {
+            type: "server",
+            message: first.message
+          });
+        } else {
+          toast.error(response.message ?? "O servidor está em manutenção, tente novamente mais tarde...");
+        }
+      }
     });
   }
 
@@ -148,7 +161,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
             <FieldGroup>
               <Field>
-                <Button className={"bg-green-high"} type="submit" disabled={signup.isPending}>
+                <Button id="submit" className={"bg-green-high"} type="submit" disabled={signup.isPending}>
                   {signup.isPending ? <LoaderCircle className="animate-sping" /> : "Criar conta"}
                 </Button>
                 <FieldDescription className="px-6 text-center">
