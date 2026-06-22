@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('create transaction income success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -23,7 +23,7 @@ test('create transaction income success', async ({ page }) => {
 test('create transaction income with negative price, expect send request howether without negative signal', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -45,7 +45,7 @@ test('create transaction income with negative price, expect send request howethe
 test('create transaction expense success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -68,7 +68,7 @@ test('create transaction expense success', async ({ page }) => {
 test('delete transaction success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -85,7 +85,7 @@ test('delete transaction success', async ({ page }) => {
 test('edit transaction success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -110,7 +110,7 @@ test('edit transaction success', async ({ page }) => {
 test('edit transaction error with input description null', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();

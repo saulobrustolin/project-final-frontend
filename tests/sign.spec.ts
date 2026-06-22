@@ -5,8 +5,8 @@ test('signup success', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Registrar' }).click();
 
-  await page.getByRole('textbox', { name: 'Nome completo' }).fill('Saulo Brustolin');
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'Nome completo' }).fill('João Gomes');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'CPF' }).fill('849.789.940-71');
   await page.locator('#password').fill('senha123$');
   await page.locator('#confirm-password').fill('senha123$');
@@ -21,7 +21,7 @@ test('signup success', async ({ page }) => {
 test('signin success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -34,7 +34,7 @@ test('signin success', async ({ page }) => {
 test('signin error', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha1234');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -47,8 +47,8 @@ test('signup already email', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Registrar' }).click();
 
-  await page.getByRole('textbox', { name: 'Nome completo' }).fill('Saulo Brustolin');
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'Nome completo' }).fill('João Gomes');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'CPF' }).fill('302.408.410-00');
   await page.locator('#password').fill('senha123$');
   await page.locator('#confirm-password').fill('senha123$');
@@ -63,7 +63,7 @@ test('signup incorrect password', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Registrar' }).click();
 
-  await page.getByRole('textbox', { name: 'Nome completo' }).fill('Saulo Brustolin');
+  await page.getByRole('textbox', { name: 'Nome completo' }).fill('João Gomes');
   await page.getByRole('textbox', { name: 'E-mail' }).fill('saulohave@icloud.com');
   await page.getByRole('textbox', { name: 'CPF' }).fill('879.331.380-20');
   await page.locator('#password').fill('senha123$');

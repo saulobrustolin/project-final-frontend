@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('create budget success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -29,7 +29,7 @@ test('create budget success', async ({ page }) => {
 test('create budget error with form null', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -52,7 +52,7 @@ test('create budget error with form null', async ({ page }) => {
 test('create budget and edit with success', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -88,7 +88,7 @@ test('create budget and edit with success', async ({ page }) => {
 test('create budget and edit with error description null', async ({ page }) => {
   await page.goto('/signin');
 
-  await page.getByRole('textbox', { name: 'E-mail' }).fill('saulobrustolin@icloud.com');
+  await page.getByRole('textbox', { name: 'E-mail' }).fill('joaogomes@gmail.com');
   await page.getByRole('textbox', { name: 'Senha' }).fill('senha123$');
 
   await page.getByRole('button', { name: 'Entrar' }).click();
