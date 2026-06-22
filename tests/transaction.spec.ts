@@ -92,7 +92,7 @@ test('edit transaction success', async ({ page }) => {
 
   await page.waitForURL('');
 
-  await page.locator('button[data-slot="dropdown-menu-trigger"]').first().click();
+  await page.locator('button[data-slot="dropdown-menu-trigger"]').last().click();
   await page.locator('div[data-slot="dropdown-menu-item"]').getByText('Editar').click();
 
   await page.locator('#description').fill('batata roxa');
