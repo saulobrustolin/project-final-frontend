@@ -77,7 +77,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(submitLogin)}>
+          <form method="POST" onSubmit={handleSubmit(submitLogin)}>
             <FieldGroup>
               <Field data-invalid={!!errors.email}>
                 <FieldLabel htmlFor="email">E-mail</FieldLabel>

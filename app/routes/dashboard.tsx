@@ -333,6 +333,7 @@ const Dashboard = () => {
                                     placeholder="Digite o número de parcelas"
                                     aria-invalid={!!errors.subdivision}
                                     type="number"
+                                    step="1"
                                     {...register("subdivision", { valueAsNumber: true })}
                                   />
                                   <FieldError>
