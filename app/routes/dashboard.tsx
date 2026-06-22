@@ -538,7 +538,7 @@ const Dashboard = () => {
                         {errors.description && <p className="text-destructive">{errors.description.message}</p>}
                       </FieldError>
                     </Field>
-                    <Field data-invalid={!!errors.description}>
+                    <Field data-invalid={!!errors.amount}>
                       <FieldLabel htmlFor="amount">Preço (R$)</FieldLabel>
                       <Controller
                         name="amount"

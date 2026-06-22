@@ -162,7 +162,7 @@ const Budgets = () => {
                                                 {errors.description && <p className="text-destructive">{errors.description.message}</p>}
                                             </FieldError>
                                         </Field>
-                                        <Field data-invalid={!!errors.description}>
+                                        <Field data-invalid={!!errors.target}>
                                             <FieldLabel htmlFor="target">Valor da meta (R$)</FieldLabel>
                                             <Controller
                                                 name="target"
