@@ -45,6 +45,8 @@ const Dashboard = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
   const [isSubdivision, setIsSubdivision] = useState<boolean>(false);
+  const [isOpenSelectDateExpense, setIsOpenSelectDateExpense] = useState(false);
+  const [isOpenSelectDateIncome, setIsOpenSelectDateIncome] = useState(false);
 
   const [period, setPeriod] = useState<DateRange | undefined>({
     from: addDays(new Date(), -15),
@@ -375,7 +377,7 @@ const Dashboard = () => {
                               name="date"
                               control={control}
                               render={({ field: { onChange, value } }) => (
-                                <Popover>
+                                <Popover open={isOpenSelectDateExpense} onOpenChange={setIsOpenSelectDateExpense}>
                                   <PopoverTrigger asChild>
                                     <Button
                                       variant="outline"
@@ -390,7 +392,10 @@ const Dashboard = () => {
                                     <Calendar
                                       mode="single"
                                       selected={value}
-                                      onSelect={onChange}
+                                      onSelect={(date: Date | undefined) => {
+                                        onChange(date);
+                                        setIsOpenSelectDateExpense(false);
+                                      }}
                                       defaultMonth={value}
                                       locale={ptBR}
                                     />
@@ -611,7 +616,10 @@ const Dashboard = () => {
                               <Calendar
                                 mode="single"
                                 selected={value}
-                                onSelect={onChange}
+                                onSelect={(date: Date | undefined) => {
+                                  onChange(date);
+                                  setIsOpenSelectDateIncome(false);
+                                }}
                                 defaultMonth={value}
                                 locale={ptBR}
                               />
