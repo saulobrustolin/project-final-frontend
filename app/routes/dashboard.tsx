@@ -1,12 +1,11 @@
 import { Card, CardContent, CardFooter, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/dashboard";
-import { CalendarIcon, ChevronDownIcon, CircleArrowDown, CircleArrowUp, CircleMinus, Loader, MoreHorizontalIcon, Plus } from "lucide-react";
+import { ChevronDownIcon, ChevronLeft, ChevronRight, CircleArrowDown, CircleArrowUp, CircleMinus, Loader, MoreHorizontalIcon, Plus } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Field, FieldError, FieldLabel, FieldSet } from "~/components/ui/field";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { useEffect, useState } from "react";
-import type { DateRange } from "react-day-picker";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar } from "~/components/ui/calendar";
 import { ptBR } from "date-fns/locale";
 import resumeQuery from "~/queries/resumeQuery";
@@ -40,18 +39,16 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 
+const today = new Date();
+
 const Dashboard = () => {
   const [openCreateTransaction, setOpenCreateTransaction] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
   const [isSubdivision, setIsSubdivision] = useState<boolean>(false);
-  const [isOpenSelectDateExpense, setIsOpenSelectDateExpense] = useState(false);
-  const [isOpenSelectDateIncome, setIsOpenSelectDateIncome] = useState(false);
+  const [isOpenSelectDate, setIsOpenSelectDate] = useState(false);
 
-  const [period, setPeriod] = useState<DateRange | undefined>({
-    from: addDays(new Date(), -15),
-    to: addDays(new Date(), 15),
-  });
+  const [period, setPeriod] = useState<Date>(new Date());
 
   const resume = resumeQuery(period);
   const createTransaction = createTransactionQuery();
@@ -146,39 +143,32 @@ const Dashboard = () => {
     });
   }
 
+  const handleChangePeriod = (date: Date, value: number) => {
+    const newDate = new Date(date);
+
+    newDate.setMonth(newDate.getMonth() + value);
+
+    return newDate;
+  }
+
   return (
     <>
       <Card className="flex flex-col gap-4 bg-transparent ring-0 p-0.5">
-        <Field className="w-60">
-          <FieldLabel htmlFor="date-picker-range">Defina o período</FieldLabel>
-          <Popover>
-            <PopoverTrigger asChild >
-              <Button variant="outline" id="date-picker-range" className="justify-start px-2.5 font-normal"><CalendarIcon data-icon="inline-start" />{period?.from ? (
-                period.to ? (
-                  <>
-                    {format(period.from, "dd/MM/yyyy")} -{" "}
-                    {format(period.to, "dd/MM/yyyy")}
-                  </>
-                ) : (
-                  format(period.from, "dd/MM/yyyy")
-                )
-              ) : (
-                <span>Escolha o período</span>
-              )
-              }</Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="range"
-                defaultMonth={period?.from}
-                selected={period}
-                onSelect={setPeriod}
-                numberOfMonths={2}
-                locale={ptBR}
-                showOutsideDays={false}
-              />
-            </PopoverContent>
-          </Popover>
+        <Field>
+          <div className="flex justify-between items-center">
+            <ChevronLeft
+              onClick={() => setPeriod(date => handleChangePeriod(date, -1))}
+              className="cursor-pointer"
+            />
+            <h1 className="capitalize text-lg select-none">
+              {new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(period)}
+              {period.getFullYear() != today.getFullYear() ? `/${period.getFullYear()}` : null}
+            </h1>
+            <ChevronRight
+              onClick={() => setPeriod(date => handleChangePeriod(date, 1))}
+              className="cursor-pointer"
+            />
+          </div>
         </Field>
         <CardTitle className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="p-4 min-h-28">
@@ -377,7 +367,7 @@ const Dashboard = () => {
                               name="date"
                               control={control}
                               render={({ field: { onChange, value } }) => (
-                                <Popover open={isOpenSelectDateExpense} onOpenChange={setIsOpenSelectDateExpense}>
+                                <Popover open={isOpenSelectDate} onOpenChange={setIsOpenSelectDate}>
                                   <PopoverTrigger asChild>
                                     <Button
                                       variant="outline"
@@ -394,7 +384,7 @@ const Dashboard = () => {
                                       selected={value}
                                       onSelect={(date: Date | undefined) => {
                                         onChange(date);
-                                        setIsOpenSelectDateExpense(false);
+                                        setIsOpenSelectDate(false);
                                       }}
                                       defaultMonth={value}
                                       locale={ptBR}
@@ -618,7 +608,7 @@ const Dashboard = () => {
                                 selected={value}
                                 onSelect={(date: Date | undefined) => {
                                   onChange(date);
-                                  setIsOpenSelectDateIncome(false);
+                                  setIsOpenSelectDate(false);
                                 }}
                                 defaultMonth={value}
                                 locale={ptBR}
