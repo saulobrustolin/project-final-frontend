@@ -34,7 +34,7 @@ export interface Budget {
 }
 
 export interface Resume {
-    balance: number,
+    current_balance: number,
     net_balance: number,
     credit: number,
     debit: number,
