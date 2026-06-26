@@ -182,7 +182,7 @@ const Dashboard = () => {
               {resume.isLoading ? (
                 <Skeleton className="h-8 w-16 rounded-full" />
               ) : (
-                resume.data?.current_balance ? <NumberTicker value={resume.data?.balance / 100} /> : "R$ 0,00"
+                resume.data?.current_balance ? <NumberTicker value={resume.data?.current_balance / 100} /> : "R$ 0,00"
               )}
             </CardContent>
           </Card>
