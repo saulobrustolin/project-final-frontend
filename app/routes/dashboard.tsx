@@ -46,6 +46,7 @@ const Dashboard = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
   const [isSubdivision, setIsSubdivision] = useState<boolean>(false);
+  const [isRecurrence, setIsRecurrence] = useState<boolean>(false);
   const [isOpenSelectDate, setIsOpenSelectDate] = useState(false);
 
   const [period, setPeriod] = useState<Date>(new Date());
@@ -76,13 +77,18 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!openCreateTransaction && !isDeleteDialogOpen && !isUpdateDialogOpen) reset({
-      description: '',
-      amount: 0,
-      collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
-      date: new Date(),
-      type: "INCOME"
-    });
+    if (!openCreateTransaction && !isDeleteDialogOpen && !isUpdateDialogOpen) {
+      reset({
+        description: '',
+        amount: 0,
+        collection: { name: 'Não específicado', icon: 'CircleQuestionMark' },
+        date: new Date(),
+        type: "INCOME"
+      });
+      unregister(["recurrence", "subdivision"], { keepValue: false });
+      setIsRecurrence(false);
+      setIsSubdivision(false);
+    }
   }, [openCreateTransaction, isDeleteDialogOpen, isUpdateDialogOpen])
 
   const submitCreateTransaction = async (data: TransactionData) => {
@@ -334,6 +340,29 @@ const Dashboard = () => {
                                 </Field>
                               ) : null}
                             </>
+                          ) : null}
+                          <div className="flex items-center space-x-2">
+                            <Switch id="recurrence-switch" onCheckedChange={v => {
+                              setIsRecurrence(v);
+                              if (!v) unregister("recurrence");
+                            }} />
+                            <Label htmlFor="recurrence-switch">Recorrência</Label>
+                          </div>
+                          {isRecurrence ? (
+                            <Field data-invalid={!!errors.recurrence}>
+                              <FieldLabel htmlFor="recurrence">Nº de meses</FieldLabel>
+                              <Input
+                                id="recurrence"
+                                placeholder="Digite o número de meses a duplicar"
+                                aria-invalid={!!errors.recurrence}
+                                type="number"
+                                step="1"
+                                {...register("recurrence", { valueAsNumber: true })}
+                              />
+                              <FieldError>
+                                {errors.recurrence && <p className="text-destructive">{errors.recurrence.message}</p>}
+                              </FieldError>
+                            </Field>
                           ) : null}
                           <Field data-invalid={!!errors.collection}>
                             <FieldLabel htmlFor="collection">Coleção</FieldLabel>
