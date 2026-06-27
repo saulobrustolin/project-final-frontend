@@ -12,7 +12,8 @@ export const transactionSchema = z.object({
         icon: z.string()
     }),
     date: z.date(),
-    groupId: z.enum(["ALL", "NEXT"]).nullish().optional(),
+    groupId: z.string().nullish(),
+    deletionType: z.enum(["ALL", "NEXT"]).nullish(),
 });
 
 export type TransactionData = z.infer<typeof transactionSchema>;

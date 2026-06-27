@@ -73,6 +73,7 @@ const Dashboard = () => {
     reset,
     unregister,
     watch,
+    getValues,
     formState: { errors }
   } = useForm<TransactionData>({
     resolver: zodResolver(transactionSchema),
@@ -141,11 +142,11 @@ const Dashboard = () => {
 
   const onAcceptDeleteTransaction = async () => {
     const transactionId = watch("transactionId");
-    const groupId = watch("groupId");
+    const deletionType = watch("deletionType");
 
     await deleteTransaction.mutateAsync({
       id: transactionId ?? '',
-      type: groupId as "NEXT" | "ALL"
+      type: deletionType as "NEXT" | "ALL"
     }, {
       onSuccess: () => {
         toast.success("A transação foi deletada com sucesso");
@@ -169,6 +170,10 @@ const Dashboard = () => {
 
     return newDate;
   }
+
+  useEffect(() => {
+    console.log(getValues());
+  }, [getValues()])
 
   return (
     <>
@@ -511,7 +516,7 @@ const Dashboard = () => {
                                   <DropdownMenuItem variant="destructive"
                                     onSelect={e => {
                                       e.preventDefault();
-                                      const t = { ...transaction, collection: collections.get(transaction.collection.name) };
+                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), deletionType: null };
                                       reset(t);
                                       setActiveDialog(DIALOGS.CONFIRM_DELETE);
                                     }}
@@ -523,7 +528,7 @@ const Dashboard = () => {
                                       <DropdownMenuItem variant="destructive"
                                         onSelect={e => {
                                           e.preventDefault();
-                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "NEXT" as const };
+                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), deletionType: "NEXT" as const };
                                           reset(t);
                                           setActiveDialog(DIALOGS.CONFIRM_DELETE);
                                         }}
@@ -533,7 +538,7 @@ const Dashboard = () => {
                                       <DropdownMenuItem variant="destructive"
                                         onSelect={e => {
                                           e.preventDefault();
-                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "ALL" as const };
+                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), deletionType: "ALL" as const };
                                           reset(t);
                                           setActiveDialog(DIALOGS.CONFIRM_DELETE);
                                         }}
