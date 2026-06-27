@@ -1,8 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "~/lib/api";
 
-const deleteTransaction = async (id: string) => {
-    await api.delete(`/transactions/${id}`);
+type DeleteTransactionArgs = {
+  id: string;
+  type: "NEXT" | "ALL";
+};
+
+const deleteTransaction = async ({ id, type }: DeleteTransactionArgs) => {
+    await api.delete(`/transactions/${id}`, {
+      params: {
+        type
+      }
+    });
 }
 
 export function useDeleteTransaction() {

@@ -41,13 +41,22 @@ export function meta({ }: Route.MetaArgs) {
 
 const today = new Date();
 
+const DIALOGS = {
+  CREATE_TRANSACTION: 'CREATE_TRANSACTION',
+  DELETE_TRANSACTION: 'DELETE_TRANSACTION',
+  CONFIRM_DELETE: 'CONFIRM_DELETE',
+  UPDATE_TRANSACTION: 'UPDATE_TRANSACTION',
+  SELECT_DATE: 'SELECT_DATE',
+};
+
 const Dashboard = () => {
-  const [openCreateTransaction, setOpenCreateTransaction] = useState<boolean>(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
+  const [activeDialog, setActiveDialog] = useState<string | null>(null);
+  const [isOpenSelectDate, setIsOpenSelectDate] = useState<boolean>(false);
+
+  const toggleDialog = (id: string) => setActiveDialog(currentActive => (currentActive === id ? null : id));
+
   const [isSubdivision, setIsSubdivision] = useState<boolean>(false);
   const [isRecurrence, setIsRecurrence] = useState<boolean>(false);
-  const [isOpenSelectDate, setIsOpenSelectDate] = useState(false);
 
   const [period, setPeriod] = useState<Date>(new Date());
 
@@ -77,7 +86,7 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!openCreateTransaction && !isDeleteDialogOpen && !isUpdateDialogOpen) {
+    if (!activeDialog) {
       reset({
         description: '',
         amount: 0,
@@ -85,17 +94,17 @@ const Dashboard = () => {
         date: new Date(),
         type: "INCOME"
       });
-      unregister(["recurrence", "subdivision"], { keepValue: false });
+      unregister(["recurrence", "subdivision", "groupId"], { keepValue: false });
       setIsRecurrence(false);
       setIsSubdivision(false);
     }
-  }, [openCreateTransaction, isDeleteDialogOpen, isUpdateDialogOpen])
+  }, [activeDialog])
 
   const submitCreateTransaction = async (data: TransactionData) => {
     await createTransaction.mutate(data, {
       onSuccess: () => {
         toast.success("A transação foi criada com sucesso");
-        setOpenCreateTransaction(false);
+        setActiveDialog(null);
         reset({
           description: '',
           amount: 0,
@@ -112,7 +121,7 @@ const Dashboard = () => {
     await updateTransaction.mutate(data, {
       onSuccess: () => {
         toast.success("A transação foi editada com sucesso");
-        setIsUpdateDialogOpen(false);
+        setActiveDialog(null);
         reset({
           description: '',
           amount: 0,
@@ -127,13 +136,17 @@ const Dashboard = () => {
 
   const handleOpenDrawer = (type: "INCOME" | "EXPENSE") => {
     setValue("type", type);
-    setOpenCreateTransaction(true);
+    setActiveDialog(DIALOGS.CREATE_TRANSACTION);
   };
 
   const onAcceptDeleteTransaction = async () => {
     const transactionId = watch("transactionId");
+    const groupId = watch("groupId");
 
-    await deleteTransaction.mutateAsync(transactionId ?? '', {
+    await deleteTransaction.mutateAsync({
+      id: transactionId ?? '',
+      type: groupId as "NEXT" | "ALL"
+    }, {
       onSuccess: () => {
         toast.success("A transação foi deletada com sucesso");
         reset({
@@ -143,7 +156,7 @@ const Dashboard = () => {
           date: new Date(),
           type: "INCOME"
         });
-        setIsDeleteDialogOpen(false);
+        setActiveDialog(null);
       },
       onError: () => toast.error("O servidor está em manutenção, tente novamente mais tarde...")
     });
@@ -262,8 +275,8 @@ const Dashboard = () => {
                 icon: <Plus />
               }}
               titleClose="Fechar"
-              open={openCreateTransaction}
-              onOpenChange={setOpenCreateTransaction}
+              open={activeDialog === DIALOGS.CREATE_TRANSACTION}
+              onOpenChange={() => toggleDialog(DIALOGS.CREATE_TRANSACTION)}
               className="hidden bg-red-400 text-white p-6 hover:bg-red-500 hover:ring-4 hover:ring-neutral-100/25 hover:text-white"
             >
               <DrawerContent className="p-4 py-6">
@@ -489,7 +502,7 @@ const Dashboard = () => {
                                       e.preventDefault();
                                       const t = { ...transaction, collection: collections.get(transaction.collection.name), date: new Date(transaction.date) };
                                       reset(t);
-                                      setIsUpdateDialogOpen(true);
+                                      setActiveDialog(DIALOGS.UPDATE_TRANSACTION);
                                     }}
                                   >
                                     Editar
@@ -500,10 +513,31 @@ const Dashboard = () => {
                                       e.preventDefault();
                                       const t = { ...transaction, collection: collections.get(transaction.collection.name) };
                                       reset(t);
-                                      setIsDeleteDialogOpen(true);
+                                      setActiveDialog(DIALOGS.CONFIRM_DELETE);
                                     }}
                                   >
                                     Deletar
+                                  </DropdownMenuItem>
+                                  {}
+                                  <DropdownMenuItem variant="destructive"
+                                    onSelect={e => {
+                                      e.preventDefault();
+                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "NEXT" as const };
+                                      reset(t);
+                                      setActiveDialog(DIALOGS.CONFIRM_DELETE);
+                                    }}
+                                  >
+                                    Deletar próximos
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem variant="destructive"
+                                    onSelect={e => {
+                                      e.preventDefault();
+                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "ALL" as const };
+                                      reset(t);
+                                      setActiveDialog(DIALOGS.CONFIRM_DELETE);
+                                    }}
+                                  >
+                                    Deletar todos
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -523,10 +557,9 @@ const Dashboard = () => {
       <Alert
         title="Você tem certeza absoluta?"
         description="Esta ação não pode ser desfeita e excluirá permanentemente o registro."
-        onCancel={() => setOpenCreateTransaction(false)}
         onAccept={onAcceptDeleteTransaction}
-        isOpen={isDeleteDialogOpen}
-        setIsOpen={setIsDeleteDialogOpen}
+        isOpen={activeDialog === DIALOGS.CONFIRM_DELETE}
+        setIsOpen={() => toggleDialog(DIALOGS.CONFIRM_DELETE)}
         loading={deleteTransaction.isPending}
       />
 
@@ -537,8 +570,8 @@ const Dashboard = () => {
         }}
         titleClose="Fechar"
         onAction={() => setValue("type", "EXPENSE")}
-        open={isUpdateDialogOpen}
-        onOpenChange={setIsUpdateDialogOpen}
+        open={activeDialog === DIALOGS.UPDATE_TRANSACTION}
+        onOpenChange={() => toggleDialog(DIALOGS.UPDATE_TRANSACTION)}
         className="bg-red-400 hidden text-white p-6 hover:bg-red-500 hover:ring-4 hover:ring-neutral-100/25 hover:text-white"
       >
         <DrawerContent className="p-4 py-6">

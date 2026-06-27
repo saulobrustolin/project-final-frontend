@@ -11,7 +11,8 @@ export const transactionSchema = z.object({
         name: z.string().nonempty("É necessário escolher uma coleção"),
         icon: z.string()
     }),
-    date: z.date()
+    date: z.date(),
+    groupId: z.enum(["ALL", "NEXT"]).optional(),
 });
 
 export type TransactionData = z.infer<typeof transactionSchema>;

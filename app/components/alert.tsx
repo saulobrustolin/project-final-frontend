@@ -1,18 +1,16 @@
-import type { Dispatch, SetStateAction } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
 import { LoaderCircle } from "lucide-react";
 
 interface AlertProps {
     isOpen: boolean;
-    setIsOpen: Dispatch<SetStateAction<boolean>>;
+    setIsOpen: () => void;
     title: string;
     description: string;
-    onCancel: () => void;
     onAccept: () => void;
     loading: boolean;
 }
 
-const Alert = ({ isOpen, setIsOpen, title, description, onCancel, onAccept, loading }: AlertProps) => {
+const Alert = ({ isOpen, setIsOpen, title, description, onAccept, loading }: AlertProps) => {
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogContent>
@@ -23,7 +21,7 @@ const Alert = ({ isOpen, setIsOpen, title, description, onCancel, onAccept, load
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel} disabled={loading}>
+                    <AlertDialogCancel disabled={loading}>
                         Cancelar
                     </AlertDialogCancel>
                     <AlertDialogAction
