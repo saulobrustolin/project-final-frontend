@@ -518,27 +518,30 @@ const Dashboard = () => {
                                   >
                                     Deletar
                                   </DropdownMenuItem>
-                                  {}
-                                  <DropdownMenuItem variant="destructive"
-                                    onSelect={e => {
-                                      e.preventDefault();
-                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "NEXT" as const };
-                                      reset(t);
-                                      setActiveDialog(DIALOGS.CONFIRM_DELETE);
-                                    }}
-                                  >
-                                    Deletar próximos
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem variant="destructive"
-                                    onSelect={e => {
-                                      e.preventDefault();
-                                      const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "ALL" as const };
-                                      reset(t);
-                                      setActiveDialog(DIALOGS.CONFIRM_DELETE);
-                                    }}
-                                  >
-                                    Deletar todos
-                                  </DropdownMenuItem>
+                                  {transaction.groupId && (
+                                    <>
+                                      <DropdownMenuItem variant="destructive"
+                                        onSelect={e => {
+                                          e.preventDefault();
+                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "NEXT" as const };
+                                          reset(t);
+                                          setActiveDialog(DIALOGS.CONFIRM_DELETE);
+                                        }}
+                                      >
+                                        Deletar próximos
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem variant="destructive"
+                                        onSelect={e => {
+                                          e.preventDefault();
+                                          const t = { ...transaction, collection: collections.get(transaction.collection.name), groupId: "ALL" as const };
+                                          reset(t);
+                                          setActiveDialog(DIALOGS.CONFIRM_DELETE);
+                                        }}
+                                      >
+                                        Deletar todos
+                                      </DropdownMenuItem>
+                                    </>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </TableCell>

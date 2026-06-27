@@ -12,7 +12,7 @@ export const transactionSchema = z.object({
         icon: z.string()
     }),
     date: z.date(),
-    groupId: z.enum(["ALL", "NEXT"]).optional(),
+    groupId: z.enum(["ALL", "NEXT"]).nullish().optional(),
 });
 
 export type TransactionData = z.infer<typeof transactionSchema>;

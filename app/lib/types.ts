@@ -18,7 +18,8 @@ export interface Transaction {
     amount: number,
     type: "INCOME" | "EXPENSE",
     collection: CollectionType,
-    date: Date
+    date: Date,
+    groupId: "ALL" | "NEXT" | null
 }
 
 export interface TransactionForm extends Omit<Transaction, 'transactionId'> {
