@@ -12,8 +12,8 @@ export const collections: Map<string, CollectionType> = new Map([
     ['Água', { name: 'Água', icon: 'Droplet' }],
     ['Mercado', { name: 'Mercado', icon: 'ShoppingBasket' }],
     ['Viagem', { name: 'Viagem', icon: 'Plane' }],
-    ['Viagem', { name: 'Carro', icon: 'Car' }],
-    ['Viagem', { name: 'Saúde', icon: 'Cross' }],
+    ['Carro', { name: 'Carro', icon: 'Car' }],
+    ['Saúde', { name: 'Saúde', icon: 'Cross' }],
 ]);
 
 export const menus = [
